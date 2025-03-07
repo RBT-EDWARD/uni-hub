@@ -19,11 +19,14 @@ from django.urls import path, include
 from django.urls import path
 from rest_framework import routers
 from events.api_views import EventViewSet
+from communities.views import CommunityViewSet
 
 router = routers.DefaultRouter()
 router.register(r'events', EventViewSet)
+router.register(r'communities', CommunityViewSet)
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/', include(router.urls)),
+    path('users/', include('users.urls')),
 ]
