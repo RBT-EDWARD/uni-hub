@@ -21,6 +21,11 @@ from rest_framework import routers
 from events.api_views import EventViewSet
 from communities.views import CommunityViewSet
 
+from rest_framework_simplejwt.views import (
+    TokenObtainPairView,
+    TokenRefreshView,
+)
+
 router = routers.DefaultRouter()
 router.register(r'events', EventViewSet)
 router.register(r'communities', CommunityViewSet)
@@ -29,4 +34,9 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/', include(router.urls)),
     path('users/', include('users.urls')),
+
+    path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
+    path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
+
+    
 ]
