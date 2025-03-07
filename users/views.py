@@ -1,6 +1,7 @@
 from django.shortcuts import render, redirect
 from .forms import UserRegisterForm
 from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth import logout
 
 def register(request):
     if request.method == 'POST':
@@ -23,3 +24,7 @@ def login_view(request):
         else:
             return render(request, 'users/login.html', {'error': 'Invalid credentials'})
     return render(request, 'users/login.html')
+
+def logout_view(request):
+    logout(request)
+    return redirect('login')
