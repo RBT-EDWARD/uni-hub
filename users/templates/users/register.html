@@ -1,16 +1,62 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Register</title>
+    <title>Register - Uni Hub</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
-<body>
-    <h2>Register for Uni Hub</h2>
-    <form method="POST">
-        {% csrf_token %}
-        {{ form.as_p }}
-        <button type="submit">Register</button>
-    </form>
+
+<body class="d-flex vh-100 align-items-center justify-content-center">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-4">
+                <h2 class="text-center">Register for Uni Hub</h2>
+                {% if form.errors %}
+                <div class="alert alert-danger">
+                    <strong>Alert</strong>
+                    <ul>
+                        {% for field, errors in form.errors.items %}
+                        {% for error in errors %}
+                        <li>{{ error }}</li>
+                        {% endfor %}
+                        {% endfor %}
+                    </ul>
+                </div>
+                {% endif %}
+                <form method="POST" action="{% url 'register' %}">
+                    {% csrf_token %}
+                    <div class="from-group mb-3">
+                        <label for="forusername">Username</label>
+                        {{ form.username }}
+                    </div>
+                    <div class="from-group mb-3">
+                        <label for="foremail">Email</label>
+                        {{ form.email }}
+                    </div>
+                    <div class="from-group mb-3">
+                        <label for="forpassword1">Password</label>
+                        {{ form.password1 }}
+                    </div>
+                    <div class="from-group mb-3">
+                        <label for="forpassword2">Confirm Password</label>
+                        {{ form.password2 }}
+                    </div>
+                    <div class="from-group mb-3">
+                        <label for="forbio">Bio</label>
+                        {{ form.bio }}
+                    </div>
+                    <div class="from-group mb-3">
+                        <label for="forinterests">Interests</label>
+                        {{ form.interests }}
+                    </div>
+                    <button type="submit" class="btn btn-success w-100">Register</button>
+                </form>
+                <p class="text-center mt-2">Already have an account? <a href="{% url 'login' %}">Login here</a></p>
+            </div>
+        </div>
+    </div>
 </body>
+
 </html>
