@@ -84,4 +84,4 @@ def logout_view(request):
     return redirect('login')
 
 def community_page(request):
-    return render(request, 'community.html')
+    return render(request, 'users/community.html')
