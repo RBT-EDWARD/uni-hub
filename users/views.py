@@ -5,6 +5,8 @@ from django.contrib.auth import logout
 from .models import *
 from django.contrib import messages
 
+
+
 def register(request):
     if request.method == 'POST':
         form = UserRegisterForm(request.POST)
@@ -80,3 +82,6 @@ def logout_view(request):
     logout(request)
     messages.success(request,'Logout successfully!')
     return redirect('login')
+
+def community_page(request):
+    return render(request, 'community.html')
