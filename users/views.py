@@ -5,6 +5,7 @@ from django.contrib.auth import logout
 from .models import *
 from django.contrib import messages
 from communities.models import Community
+from events.models import Event
 
 
 
@@ -87,3 +88,8 @@ def logout_view(request):
 def community_page(request):
     communities = Community.objects.all()
     return render(request, 'users/community.html', {'communities': communities})
+
+
+def event_page(request):
+    events = Event.objects.all()
+    return render(request, 'users/event.html', {'events': events})
