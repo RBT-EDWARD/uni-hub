@@ -4,6 +4,7 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth import logout
 from .models import *
 from django.contrib import messages
+from communities.models import Community
 
 
 
@@ -84,4 +85,5 @@ def logout_view(request):
     return redirect('login')
 
 def community_page(request):
-    return render(request, 'users/community.html')
+    communities = Community.objects.all()
+    return render(request, 'users/community.html', {'communities': communities})
