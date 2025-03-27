@@ -1,26 +1,13 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Communities</title>
-    <style>
-        body { font-family: Arial, sans-serif; padding: 20px; }
-        h1 { font-size: 36px; }
-        ul { list-style-type: none; padding: 0; }
-        li {
-            background: #f0f0f0;
-            margin: 10px 0;
-            padding: 15px;
-            border-radius: 8px;
-        }
-    </style>
-</head>
-<body>
+{% extends "users/index_page.html" %}
+
+{% block content %}
+<div class="container mt-4">
     <h1>Communities</h1>
 
     {% if communities %}
-        <ul>
+        <ul class="list-group">
             {% for community in communities %}
-                <li>
+                <li class="list-group-item">
                     <strong>{{ community.name }}</strong><br>
                     {{ community.description }}
                 </li>
@@ -29,5 +16,5 @@
     {% else %}
         <p>No communities found.</p>
     {% endif %}
-</body>
-</html>
+</div>
+{% endblock %}
