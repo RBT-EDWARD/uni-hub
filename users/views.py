@@ -6,7 +6,9 @@ from .models import *
 from django.contrib import messages
 from communities.models import Community
 from events.models import Event
-
+from django.contrib.auth.decorators import login_required
+from django.shortcuts import redirect, get_object_or_404
+from django.db.models import Q
 
 
 def register(request):
@@ -88,6 +90,31 @@ def logout_view(request):
 def community_page(request):
     communities = Community.objects.all()
     return render(request, 'users/community.html', {'communities': communities})
+
+@login_required
+def join_community(request, community_id):
+    community = get_object_or_404(Community, id=community_id)
+    community.members.add(request.user)
+    messages.success(request, f"You have joined the community: {community.name}")
+    return redirect('community_page')
+
+@login_required
+def leave_community(request, community_id):
+    community = get_object_or_404(Community, id=community_id)
+    community.members.remove(request.user)
+    messages.success(request, f"You have left the community: {community.name}")
+    return redirect('community_page')
+
+def community_page(request):
+    query = request.GET.get("q","")
+    if query:
+        communities = Community.objects.filter(
+            Q(name__icontains=query) | Q(description__icontains=query)
+        )
+    else:
+        communities = Community.objects.all()
+
+    return render(request,"users/community.html", {'communities': communities, 'search_query': query,})
 
 
 def event_page(request):
