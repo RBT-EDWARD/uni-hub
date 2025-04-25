@@ -9,6 +9,7 @@ from events.models import Event
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import redirect, get_object_or_404
 from django.db.models import Q
+from datetime import datetime
 
 
 
@@ -126,7 +127,33 @@ def community_page(request):
 
 def event_page(request):
     events = Event.objects.all()
-    return render(request, 'users/event.html', {'events': events})
+    communities = Community.objects.all()
+    query_text = request.GET.get("querytext","")
+    filter_date = request.GET.get("filter_date","")
+    filter_community = request.GET.get("filter_community","")
+
+    # Apply Filters
+    if query_text:
+        events = events.filter(
+            Q(title__icontains=query_text) |
+            Q(description__icontains=query_text)
+        )
+
+    if filter_date:
+        try:
+            parsed_date = datetime.strptime(filter_date, "%Y-%m-%d").date()
+            events = events.filter(date__date=parsed_date)
+        except ValueError:
+            pass # This will ignore invalide date
+
+    if filter_community:
+        events = events.filter(community_id=filter_community)
+
+    return render(request, 'users/event.html', {
+        'events': events,
+        'communities':communities,
+        'query_text': query_text,
+        })
 
 @login_required
 def join_event(request, event_id):
