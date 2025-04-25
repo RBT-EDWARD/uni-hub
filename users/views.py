@@ -120,3 +120,23 @@ def community_page(request):
 def event_page(request):
     events = Event.objects.all()
     return render(request, 'users/event.html', {'events': events})
+
+@login_required
+def join_event(request, event_id):
+    event = get_object_or_404(Event, id=event_id)
+    if request.user not in event.participants.all():
+        event.participants.add(request.user)
+        messages.success(request, f"You have successfully joined the event: {event.title}")
+    else:
+        messages.info(request, "You have already joined this event.")
+    return redirect("event_page")
+
+@login_required
+def leave_event(request, event_id):
+    event = get_object_or_404(Event, id=event_id)
+    if request.user in event.participants.all():
+        event.participants.remove(request.user)
+        messages.success(request, f"You have left the event: {event.title}")
+    else:
+        messages.warning(request, "You were not a participant of this event.")
+    return redirect("event_page")

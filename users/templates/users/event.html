@@ -1,21 +1,74 @@
 {% extends "users/index_page.html" %}
-
 {% block content %}
 <div class="container mt-4">
-    <h1>All Events</h1>
-
-    {% if events %}
-        {% for event in events %}
-            <div class="card mb-3">
-                <div class="card-body">
-                    <h5 class="card-title">{{ event.name }}</h5>
-                    <p class="card-text"><strong>Date:</strong> {{ event.date }}</p>
-                    <p class="card-text"><strong>Description:</strong> {{ event.description }}</p>
-                </div>
-            </div>
-        {% endfor %}
-    {% else %}
-        <p>No events found.</p>
-    {% endif %}
+   <h1>All Events</h1>
+   {% if messages %}
+   {% for message in messages %}
+   <div class="alert {% if message.tags == 'success' %}alert-success{% else %}alert-danger{% endif %} alert-dismissible fade show" role="alert">
+      {{ message }}
+      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+   </div>
+   {% endfor %}
+   {% endif %}
+   <!-- Filter Form -->
+   <form method="get" action="" class="mb-4">
+      <div class="row g-2">
+         <!-- Search Input -->
+         <div class="col-md-4">
+            <input type="text" name="querytext" class="form-control" placeholder="Search by name or interest..." value="{{ query_text }}">
+         </div>
+         <!-- Date Filter -->
+         <div class="col-md-3">
+            <input type="date" name="filter_date" class="form-control" value="{{ request.GET.filter_date }}">
+         </div>
+         <!-- Community Filter -->
+         <div class="col-md-3">
+            <select name="filter_community" class="form-select">
+               <option value="">All Communities</option>
+               {% for community in communities %}
+               <option value="{{ community.id }}" {% if request.GET.filter_community == community.id|stringformat:"s" %}selected{% endif %}>
+               {{ community.name }}
+               </option>
+               {% endfor %}
+            </select>
+         </div>
+         <!-- Filter and Clear Buttons -->
+         <div class="col-md-2 d-grid">
+            <button class="btn btn-primary" type="submit">Filter</button>
+         </div>
+      </div>
+      {% if request.GET.querytext or request.GET.filter_date or request.GET.filter_community %}
+      <div class="mt-2">
+         <a href="" class="btn btn-outline-secondary btn-sm">Clear All Filters</a>
+      </div>
+      {% endif %}
+   </form>
+   {% if events %}
+   {% for event in events %}
+   <div class="card mb-3">
+      <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center">
+         <div class="card-body">
+            <h5 class="card-title">{{ event.name }}</h5>
+            <p class="card-text"><strong>Date:</strong> {{ event.date }}</p>
+            <p class="card-text"><strong>Description:</strong> {{ event.description }}</p>
+         </div>
+         <!-- Action Buttons -->
+          {% if user.is_authenticated %}
+         <div class="text-md-end mt-3 mt-md-0">
+            {% if user in event.participants.all %}
+                <a href="{% url 'leave_event' event.id %}"><button type="submit" class="btn btn-outline-danger me-2">Leave</button></a>
+            {% else %}
+               <a href="{% url 'join_event' event.id %}"><button type="submit" class="btn btn-success me-2">Join</button></a>
+               <a href="{% url 'leave_event' event.id %}"><button type="submit" class="btn btn-outline-danger me-2">Leave</button></a>
+            {% endif %}
+            </form>
+         </div>
+         {% endif %}
+      </div>
+   </div>
+   {% endfor %}
+   {% else %} 
+   <p>No events found.</p>
+   {% endif %}
 </div>
 {% endblock %}
