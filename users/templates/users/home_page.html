@@ -1,57 +1,89 @@
 {% extends "users/index_page.html" %}
 {% block content %}
 {% if messages %}
-{% for message in messages %}
-<div class="alert {% if message.tags == 'success' %}alert-success{% else %}alert-danger{% endif %} alert-dismissible fade show" role="alert">
-   {{ message }}
-   <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-</div>
-{% endfor %}
+  {% for message in messages %}
+    <div class="alert {% if message.tags == 'success' %}alert-success{% else %}alert-danger{% endif %} alert-dismissible fade show" role="alert">
+      {{ message }}
+      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+  {% endfor %}
 {% endif %}
-<div class="container mt-5">
-   <div class="row">
-      <div class="col-md-7">
-         <h1 class="display-6">Welcome to the Uni Hub</h1>
-         <a href="{% url 'community_page' %}" class="btn btn-primary mt-3">
-            Go to Communities
-         </a>
-          <a href="{% url 'event_page' %}" class="btn btn-primary mt-3">Go to Events</a>
 
-          
-      </div>
-   </div>
+<div class="container mt-5">
+  <div class="row">
+    <div class="col-md-7">
+      <h1 class="display-6">Welcome to the Uni Hub</h1>
+      <a href="{% url 'community_page' %}" class="btn btn-primary mt-3">Go to Communities</a>
+      <a href="{% url 'event_page' %}" class="btn btn-primary mt-3">Go to Events</a>
+    </div>
+  </div>
 </div>
+
 <!-- Latest Communities -->
 <div class="mt-5">
-   <h3>Latest Communities</h3>
-   {% if latest_communities %}
-       <ul class="list-group">
-           {% for community in latest_communities %}
-               <li class="list-group-item">
-                   <strong>{{ community.name }}</strong> - {{ community.description }}
-               </li>
-           {% endfor %}
-       </ul>
-   {% else %}
-       <p>No communities found.</p>
-   {% endif %}
+  <h3>Latest Communities</h3>
+  {% if latest_communities %}
+    <ul class="list-group">
+      {% for community in latest_communities %}
+        <li class="list-group-item d-flex justify-content-between align-items-center">
+          <div>
+            <strong>{{ community.name }}</strong> - {{ community.description }}
+          </div>
+          {% if user.is_authenticated %}
+            <div>
+              {% if user in community.members.all %}
+                <form method="post" action="{% url 'leave_community' community.id %}?next={{ request.path }}" class="d-inline">
+                  {% csrf_token %}
+                  <button type="submit" class="btn btn-danger btn-sm">Leave</button>
+                </form>
+              {% else %}
+                <form method="post" action="{% url 'join_community' community.id %}?next={{ request.path }}" class="d-inline">
+                  {% csrf_token %}
+                  <button type="submit" class="btn btn-success btn-sm">Join</button>
+                </form>
+              {% endif %}
+            </div>
+          {% endif %}
+        </li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <p>No communities found.</p>
+  {% endif %}
 </div>
 
 <!-- Latest Events -->
 <div class="mt-5">
-   <h3>Latest Events</h3>
-   {% if latest_events %}
-       <ul class="list-group">
-           {% for event in latest_events %}
-               <li class="list-group-item">
-                   <strong>{{ event.name }}</strong> - {{ event.date }}
-                   <p>{{ event.description }}</p>
-               </li>
-           {% endfor %}
-       </ul>
-   {% else %}
-       <p>No events found.</p>
-   {% endif %}
+  <h3>Latest Events</h3>
+  {% if latest_events %}
+    <ul class="list-group">
+      {% for event in latest_events %}
+        <li class="list-group-item d-flex justify-content-between align-items-start">
+          <div>
+            <strong>{{ event.name }}</strong> - {{ event.date }}
+            <p>{{ event.description }}</p>
+          </div>
+          {% if user.is_authenticated %}
+            <div class="mt-1">
+              {% if user in event.participants.all %}
+                <form method="post" action="{% url 'leave_event' event.id %}?next={{ request.path }}" class="d-inline">
+                  {% csrf_token %}
+                  <button type="submit" class="btn btn-danger btn-sm">Leave</button>
+                </form>
+              {% else %}
+                <form method="post" action="{% url 'join_event' event.id %}?next={{ request.path }}" class="d-inline">
+                  {% csrf_token %}
+                  <button type="submit" class="btn btn-success btn-sm">Join</button>
+                </form>
+              {% endif %}
+            </div>
+          {% endif %}
+        </li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <p>No events found.</p>
+  {% endif %}
 </div>
 
 {% endblock %}
