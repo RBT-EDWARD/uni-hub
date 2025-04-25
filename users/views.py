@@ -11,6 +11,7 @@ from django.shortcuts import redirect, get_object_or_404
 from django.db.models import Q
 
 
+
 def register(request):
     if request.method == 'POST':
         form = UserRegisterForm(request.POST)
@@ -54,9 +55,15 @@ def login_view(request):
 
 def index_view(request):
     return render(request,"users/index_page.html")
-
+# the view of the home page.
 def home_view(request):
-    return render(request,"users/home_page.html")
+    latest_communities = Community.objects.all().order_by('-id')[:3]
+    latest_events = Event.objects.all().order_by('-id')[:3]
+    
+    return render(request, 'users/home_page.html', {
+        'latest_communities': latest_communities,
+        'latest_events': latest_events
+    })
 
 def profile_view(request):
     print("Logged in user:- ", request.user, request.user.id)

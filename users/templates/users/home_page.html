@@ -21,4 +21,37 @@
       </div>
    </div>
 </div>
+<!-- Latest Communities -->
+<div class="mt-5">
+   <h3>Latest Communities</h3>
+   {% if latest_communities %}
+       <ul class="list-group">
+           {% for community in latest_communities %}
+               <li class="list-group-item">
+                   <strong>{{ community.name }}</strong> - {{ community.description }}
+               </li>
+           {% endfor %}
+       </ul>
+   {% else %}
+       <p>No communities found.</p>
+   {% endif %}
+</div>
+
+<!-- Latest Events -->
+<div class="mt-5">
+   <h3>Latest Events</h3>
+   {% if latest_events %}
+       <ul class="list-group">
+           {% for event in latest_events %}
+               <li class="list-group-item">
+                   <strong>{{ event.name }}</strong> - {{ event.date }}
+                   <p>{{ event.description }}</p>
+               </li>
+           {% endfor %}
+       </ul>
+   {% else %}
+       <p>No events found.</p>
+   {% endif %}
+</div>
+
 {% endblock %}
