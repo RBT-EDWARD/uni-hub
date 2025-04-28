@@ -66,16 +66,17 @@ def home_view(request):
     })
 
 def profile_view(request):
-    print("Logged in user:- ", request.user, request.user.id)
-    logged_in_user_profile = Profile.objects.get(user=request.user)
+    print("Logged in user:-", request.user, request.user.id)
+    logged_in_user_profile, created = Profile.objects.get_or_create(user=request.user)
     return render(request, "users/profile_page.html", {"profile": logged_in_user_profile})
+
 
 def update_profile(request, pk):
     selectedProfile = Profile.objects.get(id=pk)
     if request.method == "POST":
-        userEmail = request.POST["useremail"]
-        userBio = request.POST["bio"]
-        userInterest = request.POST["interests"]
+        userEmail = request.POST.get("useremail")
+        userBio = request.POST.get("bio")
+        userInterest = request.POST.get("interests")
 
         selectedProfile.user.email = userEmail
         selectedProfile.bio = userBio
@@ -87,6 +88,7 @@ def update_profile(request, pk):
         return redirect('profile')
     else:
         return redirect('profile')
+
 
 def logout_view(request):
     logout(request)
