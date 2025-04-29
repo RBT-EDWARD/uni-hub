@@ -16,10 +16,14 @@ def register(request):
     if request.method == 'POST':
         form = UserRegisterForm(request.POST)
         if form.is_valid():
+            # Save user basic info
             user = form.save()
-            # Create an empty profile after registration
+
+            # Create profile with new fields: address, dob, interests
             Profile.objects.create(
                 user=user,
+                address=form.cleaned_data['address'],
+                dob=form.cleaned_data['dob'],
                 interests=form.cleaned_data['interests']
             )
             messages.success(request, "Register successful! Please login into your account.")
@@ -47,16 +51,16 @@ def login_view(request):
 def index_view(request):
     return render(request, "users/index_page.html")
 
-# Home view with the latest 3 communities and events
+# Home view - shows latest 3 communities and 3 events + search other students by interests
 def home_view(request):
     latest_communities = Community.objects.prefetch_related('members').order_by('-id')[:3]
     latest_events = Event.objects.prefetch_related('participants').order_by('-id')[:3]
-
     search_query = request.GET.get('q', '')
     matching_profiles = []
 
     if search_query:
         matching_profiles = Profile.objects.filter(interests__icontains=search_query)
+
     return render(request, 'users/home_page.html', {
         'latest_communities': latest_communities,
         'latest_events': latest_events,
@@ -66,7 +70,6 @@ def home_view(request):
 
 @login_required
 def profile_view(request):
-    # Ensure the user has a profile, create if not
     logged_in_user_profile, created = Profile.objects.get_or_create(user=request.user)
     return render(request, "users/profile_page.html", {"profile": logged_in_user_profile})
 
@@ -75,7 +78,6 @@ def update_profile(request, pk):
     selectedProfile = Profile.objects.get(id=pk)
 
     if request.method == "POST":
-        # Retrieve form data
         userEmail = request.POST.get("useremail")
         program = request.POST.get("program")
         year = request.POST.get("year")
@@ -83,20 +85,27 @@ def update_profile(request, pk):
         campus_involvement = request.POST.get("campus_involvement")
         achievements = request.POST.get("achievements")
         profile_picture = request.FILES.get("profile_picture")
+        address = request.POST.get("address")  # New
+        dob = request.POST.get("dob")          # New
 
         # Update user model
         selectedProfile.user.email = userEmail
 
-        # Update profile model fields
+        # Update profile fields
         selectedProfile.program = program
         selectedProfile.year = year
         selectedProfile.interests = interests
         selectedProfile.campus_involvement = campus_involvement
         selectedProfile.achievements = achievements
+        selectedProfile.address = address
+        if dob:
+            try:
+                selectedProfile.dob = dob
+            except Exception:
+                pass
         if profile_picture:
             selectedProfile.profile_picture = profile_picture
 
-        # Save changes
         selectedProfile.user.save()
         selectedProfile.save()
 
@@ -118,6 +127,7 @@ def community_page(request):
         )
     else:
         communities = Community.objects.all()
+
     return render(request, "users/community.html", {'communities': communities, 'search_query': query})
 
 @login_required
@@ -125,6 +135,7 @@ def join_community(request, community_id):
     community = get_object_or_404(Community, id=community_id)
     community.members.add(request.user)
     messages.success(request, f"You have joined the community: {community.name}")
+
     next_url = request.GET.get('next')
     if next_url and url_has_allowed_host_and_scheme(next_url, settings.ALLOWED_HOSTS):
         return redirect(next_url)
@@ -135,6 +146,7 @@ def leave_community(request, community_id):
     community = get_object_or_404(Community, id=community_id)
     community.members.remove(request.user)
     messages.success(request, f"You have left the community: {community.name}")
+
     next_url = request.GET.get('next')
     if next_url and url_has_allowed_host_and_scheme(next_url, settings.ALLOWED_HOSTS):
         return redirect(next_url)
@@ -147,7 +159,7 @@ def event_page(request):
     filter_date = request.GET.get("filter_date", "")
     filter_community = request.GET.get("filter_community", "")
 
-    # Apply Filters
+    # Apply search and filter
     if query_text:
         events = events.filter(
             Q(title__icontains=query_text) |
@@ -176,6 +188,7 @@ def join_event(request, event_id):
         messages.success(request, f"You have successfully joined the event: {event.title}")
     else:
         messages.info(request, "You have already joined this event.")
+
     next_url = request.GET.get('next')
     if next_url and url_has_allowed_host_and_scheme(next_url, settings.ALLOWED_HOSTS):
         return redirect(next_url)
@@ -189,6 +202,7 @@ def leave_event(request, event_id):
         messages.success(request, f"You have left the event: {event.title}")
     else:
         messages.warning(request, "You were not a participant of this event.")
+
     next_url = request.GET.get('next')
     if next_url and url_has_allowed_host_and_scheme(next_url, settings.ALLOWED_HOSTS):
         return redirect(next_url)
@@ -203,4 +217,3 @@ def search_users(request):
         results = Profile.objects.filter(interests__icontains=query)
 
     return render(request, 'users/search.html', {'results': results, 'query': query})
-

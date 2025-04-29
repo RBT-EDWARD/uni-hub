@@ -1,55 +1,71 @@
-<!DOCTYPE html>
-<html lang="en">
+{% extends "users/index_page.html" %}
+{% block content %}
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Register - Uni Hub</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-</head>
+<div class="row justify-content-center">
+  <div class="col-md-6">
+    <h2 class="text-center">Register</h2>
 
-<body class="d-flex vh-100 align-items-center justify-content-center">
-    <div class="container">
-        <div class="row justify-content-center">
-            <div class="col-md-4">
-                <h2 class="text-center">Register for Uni Hub</h2>
-                {% if form.errors %}
-                <div class="alert alert-danger">
-                    <strong>Alert</strong>
-                    <ul>
-                        {% for field, errors in form.errors.items %}
-                        {% for error in errors %}
-                        <li>{{ error }}</li>
-                        {% endfor %}
-                        {% endfor %}
-                    </ul>
-                </div>
-                {% endif %}
-                <form method="POST" action="{% url 'register' %}">
-                    {% csrf_token %}
-                    <div class="from-group mb-3">
-                        <label for="forusername">Username</label>
-                        {{ form.username }}
-                    </div>
-                    <div class="from-group mb-3">
-                        <label for="foremail">Email</label>
-                        {{ form.email }}
-                    </div>
-                    <div class="from-group mb-3">
-                        <label for="forpassword1">Password</label>
-                        {{ form.password1 }}
-                    </div>
-                    <div class="from-group mb-3">
-                        <label for="forpassword2">Confirm Password</label>
-                        {{ form.password2 }}
-                    </div>
-                    
-                    <button type="submit" class="btn btn-success w-100">Register</button>
-                </form>
-                <p class="text-center mt-2">Already have an account? <a href="{% url 'login' %}">Login here</a></p>
-            </div>
+    <!-- Display messages (success or error) -->
+    {% if messages %}
+      {% for message in messages %}
+        <div class="alert {% if message.tags == 'success' %}alert-success{% else %}alert-danger{% endif %} alert-dismissible fade show" role="alert">
+          {{ message }}
+          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
-    </div>
-</body>
+      {% endfor %}
+    {% endif %}
 
-</html>
+    <!-- Registration Form -->
+    <form method="post">
+      {% csrf_token %}
+      
+      <!-- Username Field -->
+      <div class="mb-3">
+        <label class="form-label">Username</label>
+        {{ form.username }}
+      </div>
+
+      <!-- Email Field -->
+      <div class="mb-3">
+        <label class="form-label">Email</label>
+        {{ form.email }}
+      </div>
+
+      <!-- Password1 Field -->
+      <div class="mb-3">
+        <label class="form-label">Password</label>
+        {{ form.password1 }}
+      </div>
+
+      <!-- Password2 Field -->
+      <div class="mb-3">
+        <label class="form-label">Confirm Password</label>
+        {{ form.password2 }}
+      </div>
+
+      <!-- Address Field -->
+      <div class="mb-3">
+        <label class="form-label">Address</label>
+        {{ form.address }}
+      </div>
+
+      <!-- Date of Birth Field -->
+      <div class="mb-3">
+        <label class="form-label">Date of Birth</label>
+        {{ form.dob }}
+      </div>
+
+      <!-- Interests Field -->
+      <div class="mb-3">
+        <label class="form-label">Interests</label>
+        {{ form.interests }}
+      </div>
+
+      <!-- Submit Button -->
+      <button type="submit" class="btn btn-primary w-100">Register</button>
+
+    </form>
+  </div>
+</div>
+
+{% endblock %}
