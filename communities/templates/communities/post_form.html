@@ -1,0 +1,23 @@
+{% extends "users/index_page.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>Create a New Post in "{{ community.name }}"</h2>
+
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }}">
+                {{ message }}
+            </div>
+        {% endfor %}
+    {% endif %}
+
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="btn btn-primary">Publish Post</button>
+    </form>
+
+    <a href="{% url 'post_list' community.id %}" class="btn btn-secondary mt-3">Back to Posts</a>
+</div>
+{% endblock %}

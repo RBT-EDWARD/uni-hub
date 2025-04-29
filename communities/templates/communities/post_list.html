@@ -1,0 +1,46 @@
+{% extends "users/index_page.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>{{ community.name }} - Community Posts</h2>
+    <p>{{ community.description }}</p>
+
+    {% if user.is_authenticated %}
+        <div class="mb-3">
+            <a href="{% url 'create_post' community.id %}" class="btn btn-primary">+ New Post</a>
+        </div>
+    {% endif %}
+
+    <!-- Unified Search Form -->
+    <form method="get" class="mb-3">
+        <div class="input-group">
+            <input type="text" name="q" class="form-control" placeholder="Search posts by tag..." value="{{ search_query }}">
+            <button class="btn btn-outline-primary" type="submit">Search</button>
+            {% if search_query %}
+                <a href="{% url 'post_list' community.id %}" class="btn btn-outline-secondary">Clear</a>
+            {% endif %}
+        </div>
+    </form>
+
+    {% if posts %}
+        <ul class="list-group">
+            {% for post in posts %}
+                <li class="list-group-item">
+                    <h5>
+                        <a href="{% url 'post_detail' post.id %}">{{ post.title }}</a>
+                    </h5>
+                    <p class="mb-1">
+                        <small>by {{ post.author.username }} • {{ post.created_at|date:"M d, Y H:i" }}</small>
+                    </p>
+                    <p>{{ post.content|truncatewords:20 }}</p>
+                    {% if post.tags %}
+                        <span class="badge bg-secondary">Tags: {{ post.tags }}</span>
+                    {% endif %}
+                </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>No posts found.</p>
+    {% endif %}
+</div>
+{% endblock %}

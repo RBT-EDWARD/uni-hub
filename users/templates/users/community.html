@@ -43,8 +43,9 @@
                             <small><strong>Meeting:</strong> {{ community.meeting_details }}</small><br>
                         {% endif %}
                         {% if community.interest_tags %}
-                            <small><strong>Tags:</strong> {{ community.interest_tags }}</small>
+                            <small><strong>Tags:</strong> {{ community.interest_tags }}</small><br>
                         {% endif %}
+                        <a href="{% url 'post_list' community.id %}" class="btn btn-outline-secondary btn-sm mt-2">View Posts</a>
                     </div>
                     {% if user.is_authenticated %}
                         <div>

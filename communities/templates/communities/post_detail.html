@@ -1,0 +1,41 @@
+{% extends "users/index_page.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>{{ post.title }}</h2>
+    <p class="text-muted">
+        By {{ post.author.username }} • {{ post.created_at|date:"M d, Y H:i" }}
+    </p>
+    <p><strong>Tags:</strong> {{ post.tags }}</p>
+    <hr>
+    <p>{{ post.content }}</p>
+
+    <hr>
+    <h4>Comments</h4>
+    {% if post.comments.all %}
+        <ul class="list-group mb-3">
+            {% for comment in post.comments.all %}
+                <li class="list-group-item">
+                    <strong>{{ comment.author.username }}</strong> — {{ comment.created_at|date:"M d, Y H:i" }}
+                    <p class="mb-0">{{ comment.content }}</p>
+                </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>No comments yet.</p>
+    {% endif %}
+
+    {% if user.is_authenticated %}
+        <h5>Add a comment</h5>
+        <form method="post">
+            {% csrf_token %}
+            {{ comment_form.as_p }}
+            <button type="submit" class="btn btn-primary">Post Comment</button>
+        </form>
+    {% else %}
+        <p><a href="{% url 'login' %}">Log in</a> to comment.</p>
+    {% endif %}
+
+    <a href="{% url 'post_list' post.community.id %}" class="btn btn-secondary mt-4">Back to Community Posts</a>
+</div>
+{% endblock %}
