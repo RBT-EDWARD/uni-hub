@@ -15,25 +15,17 @@ def register(request):
     if request.method == 'POST':
         form = UserRegisterForm(request.POST)
         if form.is_valid():
-            print("Inside the valide form")
             user = form.save()
-            # create the profile instance
+            # Create an empty profile after registration
             Profile.objects.create(
                 user=user,
-                bio=form.cleaned_data['bio'],
                 interests=form.cleaned_data['interests']
             )
-            print('Returning')
-            messages.success(request, "Register successful!,Please login into your accont.")
+            messages.success(request, "Register successful! Please login into your account.")
             return redirect('login')
         else:
-            print("Inside else :- form is not valid")
-            print(form.errors)
-            for field, errors in form.errors.items():
-                print(errors)
             return render(request, 'users/register.html', {"form": form})
     else:
-        print('Inside the else')
         form = UserRegisterForm()
         return render(request, 'users/register.html', {'form': form})
 
@@ -49,46 +41,60 @@ def login_view(request):
         else:
             messages.error(request, 'Invalid username or password')
             return redirect('login')
-
     return render(request, 'users/login.html')
 
 def index_view(request):
     return render(request, "users/index_page.html")
 
-# the view of the home page.
+# Home view with the latest 3 communities and events
 def home_view(request):
     latest_communities = Community.objects.prefetch_related('members').order_by('-id')[:3]
     latest_events = Event.objects.prefetch_related('participants').order_by('-id')[:3]
-
     return render(request, 'users/home_page.html', {
         'latest_communities': latest_communities,
         'latest_events': latest_events
     })
 
+@login_required
 def profile_view(request):
-    print("Logged in user:-", request.user, request.user.id)
+    # Ensure the user has a profile, create if not
     logged_in_user_profile, created = Profile.objects.get_or_create(user=request.user)
     return render(request, "users/profile_page.html", {"profile": logged_in_user_profile})
 
-
+@login_required
 def update_profile(request, pk):
     selectedProfile = Profile.objects.get(id=pk)
-    if request.method == "POST":
-        userEmail = request.POST.get("useremail")
-        userBio = request.POST.get("bio")
-        userInterest = request.POST.get("interests")
 
+    if request.method == "POST":
+        # Retrieve form data
+        userEmail = request.POST.get("useremail")
+        program = request.POST.get("program")
+        year = request.POST.get("year")
+        interests = request.POST.get("interests")
+        campus_involvement = request.POST.get("campus_involvement")
+        achievements = request.POST.get("achievements")
+        profile_picture = request.FILES.get("profile_picture")
+
+        # Update user model
         selectedProfile.user.email = userEmail
-        selectedProfile.bio = userBio
-        selectedProfile.interests = userInterest
-        selectedProfile.save()
+
+        # Update profile model fields
+        selectedProfile.program = program
+        selectedProfile.year = year
+        selectedProfile.interests = interests
+        selectedProfile.campus_involvement = campus_involvement
+        selectedProfile.achievements = achievements
+        if profile_picture:
+            selectedProfile.profile_picture = profile_picture
+
+        # Save changes
         selectedProfile.user.save()
+        selectedProfile.save()
 
         messages.success(request, "Profile updated successfully!")
         return redirect('profile')
-    else:
-        return redirect('profile')
 
+    return redirect('profile')
 
 def logout_view(request):
     logout(request)
@@ -103,7 +109,6 @@ def community_page(request):
         )
     else:
         communities = Community.objects.all()
-
     return render(request, "users/community.html", {'communities': communities, 'search_query': query})
 
 @login_required
@@ -111,7 +116,6 @@ def join_community(request, community_id):
     community = get_object_or_404(Community, id=community_id)
     community.members.add(request.user)
     messages.success(request, f"You have joined the community: {community.name}")
-
     next_url = request.GET.get('next')
     if next_url and url_has_allowed_host_and_scheme(next_url, settings.ALLOWED_HOSTS):
         return redirect(next_url)
@@ -122,7 +126,6 @@ def leave_community(request, community_id):
     community = get_object_or_404(Community, id=community_id)
     community.members.remove(request.user)
     messages.success(request, f"You have left the community: {community.name}")
-
     next_url = request.GET.get('next')
     if next_url and url_has_allowed_host_and_scheme(next_url, settings.ALLOWED_HOSTS):
         return redirect(next_url)
@@ -141,14 +144,12 @@ def event_page(request):
             Q(title__icontains=query_text) |
             Q(description__icontains=query_text)
         )
-
     if filter_date:
         try:
             parsed_date = datetime.strptime(filter_date, "%Y-%m-%d").date()
             events = events.filter(date__date=parsed_date)
         except ValueError:
-            pass  # This will ignore invalid date
-
+            pass
     if filter_community:
         events = events.filter(community_id=filter_community)
 
@@ -166,7 +167,6 @@ def join_event(request, event_id):
         messages.success(request, f"You have successfully joined the event: {event.title}")
     else:
         messages.info(request, "You have already joined this event.")
-
     next_url = request.GET.get('next')
     if next_url and url_has_allowed_host_and_scheme(next_url, settings.ALLOWED_HOSTS):
         return redirect(next_url)
@@ -180,7 +180,6 @@ def leave_event(request, event_id):
         messages.success(request, f"You have left the event: {event.title}")
     else:
         messages.warning(request, "You were not a participant of this event.")
-
     next_url = request.GET.get('next')
     if next_url and url_has_allowed_host_and_scheme(next_url, settings.ALLOWED_HOSTS):
         return redirect(next_url)

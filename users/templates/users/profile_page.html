@@ -1,19 +1,28 @@
 {% extends "users/index_page.html" %}
 {% block content %}
 <div class="row justify-content-center">
-    <div class="col-md-6">
-        <h2 class="text-center">Profile</h2>
+    <div class="col-md-8">
+        <h2 class="text-center mb-4">Profile</h2>
+
         <!-- Display Messages -->
-                {% if messages %}
-                {% for message in messages %}
-                <div class="alert {% if message.tags == 'success' %}alert-success{% else %}alert-danger{% endif %} alert-dismissible fade show"
-                    role="alert">
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert {% if message.tags == 'success' %}alert-success{% else %}alert-danger{% endif %} alert-dismissible fade show" role="alert">
                     {{ message }}
                     <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                 </div>
-                {% endfor %}
-                {% endif %}
-        <form method="post" action="{% url 'update_profile' pk=profile.id %}">
+            {% endfor %}
+        {% endif %}
+
+        <!-- Display Profile Picture -->
+        {% if profile.profile_picture %}
+            <div class="text-center mb-3">
+                <img src="{{ profile.profile_picture.url }}" alt="Profile Picture" class="rounded-circle" style="max-width: 150px;">
+            </div>
+        {% endif %}
+
+        <!-- Profile Update Form -->
+        <form method="post" action="{% url 'update_profile' pk=profile.id %}" enctype="multipart/form-data">
             {% csrf_token %}
             <div class="mb-3">
                 <label class="form-label">Username</label>
@@ -24,17 +33,31 @@
                 <input type="email" class="form-control" name="useremail" value="{{ profile.user.email }}">
             </div>
             <div class="mb-3">
-                <label class="form-label">Bio</label>
-                <textarea class="form-control" name="bio">{{ profile.bio }}</textarea>
+                <label class="form-label">Program</label>
+                <input type="text" class="form-control" name="program" value="{{ profile.program }}">
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Year</label>
+                <input type="text" class="form-control" name="year" value="{{ profile.year }}">
             </div>
             <div class="mb-3">
                 <label class="form-label">Interests</label>
                 <input type="text" class="form-control" name="interests" value="{{ profile.interests }}">
             </div>
+            <div class="mb-3">
+                <label class="form-label">Campus Involvement</label>
+                <textarea class="form-control" name="campus_involvement">{{ profile.campus_involvement }}</textarea>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Achievements</label>
+                <textarea class="form-control" name="achievements">{{ profile.achievements }}</textarea>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Profile Picture</label>
+                <input type="file" class="form-control" name="profile_picture">
+            </div>
             <button type="submit" class="btn btn-primary w-100">Save Changes</button>
         </form>
-
-
     </div>
 </div>
 {% endblock %}

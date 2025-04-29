@@ -43,14 +43,7 @@
                         <label for="forpassword2">Confirm Password</label>
                         {{ form.password2 }}
                     </div>
-                    <div class="from-group mb-3">
-                        <label for="forbio">Bio</label>
-                        {{ form.bio }}
-                    </div>
-                    <div class="from-group mb-3">
-                        <label for="forinterests">Interests</label>
-                        {{ form.interests }}
-                    </div>
+                    
                     <button type="submit" class="btn btn-success w-100">Register</button>
                 </form>
                 <p class="text-center mt-2">Already have an account? <a href="{% url 'login' %}">Login here</a></p>
