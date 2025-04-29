@@ -15,5 +15,7 @@ urlpatterns = [
     path('event/', views.event_page, name='event_page'),
     path('event/<int:event_id>/join/', views.join_event, name='join_event'),
     path('event/<int:event_id>/leave/', views.leave_event, name='leave_event'),
+    path('search/', views.search_users, name='search_users'),
+
 
 ]

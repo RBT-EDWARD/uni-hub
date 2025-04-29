@@ -10,6 +10,7 @@ from django.db.models import Q
 from datetime import datetime
 from django.utils.http import url_has_allowed_host_and_scheme
 from django.conf import settings
+from django.contrib.auth.models import User
 
 def register(request):
     if request.method == 'POST':
@@ -50,9 +51,17 @@ def index_view(request):
 def home_view(request):
     latest_communities = Community.objects.prefetch_related('members').order_by('-id')[:3]
     latest_events = Event.objects.prefetch_related('participants').order_by('-id')[:3]
+
+    search_query = request.GET.get('q', '')
+    matching_profiles = []
+
+    if search_query:
+        matching_profiles = Profile.objects.filter(interests__icontains=search_query)
     return render(request, 'users/home_page.html', {
         'latest_communities': latest_communities,
-        'latest_events': latest_events
+        'latest_events': latest_events,
+        'search_query': search_query,
+        'matching_profiles': matching_profiles,
     })
 
 @login_required
@@ -184,3 +193,14 @@ def leave_event(request, event_id):
     if next_url and url_has_allowed_host_and_scheme(next_url, settings.ALLOWED_HOSTS):
         return redirect(next_url)
     return redirect("event_page")
+
+@login_required
+def search_users(request):
+    query = request.GET.get('q', '')
+    results = []
+
+    if query:
+        results = Profile.objects.filter(interests__icontains=query)
+
+    return render(request, 'users/search.html', {'results': results, 'query': query})
+

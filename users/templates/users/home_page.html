@@ -1,5 +1,7 @@
 {% extends "users/index_page.html" %}
 {% block content %}
+
+<!-- Display Django messages -->
 {% if messages %}
   {% for message in messages %}
     <div class="alert {% if message.tags == 'success' %}alert-success{% else %}alert-danger{% endif %} alert-dismissible fade show" role="alert">
@@ -9,6 +11,7 @@
   {% endfor %}
 {% endif %}
 
+<!-- Welcome Section -->
 <div class="container mt-5">
   <div class="row">
     <div class="col-md-7">
@@ -19,8 +22,35 @@
   </div>
 </div>
 
-<!-- Latest Communities -->
-<div class="mt-5">
+<!-- Interest Search Form -->
+<div class="container mt-4">
+  <form method="get" class="input-group">
+    <input type="text" name="q" class="form-control" placeholder="Search users by interest..." value="{{ search_query }}">
+    <button class="btn btn-outline-secondary" type="submit">Search</button>
+  </form>
+</div>
+
+<!-- Matching Profiles Section -->
+{% if matching_profiles %}
+<div class="container mt-3">
+  <h4>Matching Students:</h4>
+  <ul class="list-group">
+    {% for profile in matching_profiles %}
+      <li class="list-group-item">
+        <strong>{{ profile.user.username }}</strong><br>
+        Interests: {{ profile.interests }}
+      </li>
+    {% endfor %}
+  </ul>
+</div>
+{% elif search_query %}
+  <div class="container mt-3">
+    <p>No matching users found for "{{ search_query }}".</p>
+  </div>
+{% endif %}
+
+<!-- Latest Communities Section -->
+<div class="container mt-5">
   <h3>Latest Communities</h3>
   {% if latest_communities %}
     <ul class="list-group">
@@ -52,15 +82,15 @@
   {% endif %}
 </div>
 
-<!-- Latest Events -->
-<div class="mt-5">
+<!-- Latest Events Section -->
+<div class="container mt-5">
   <h3>Latest Events</h3>
   {% if latest_events %}
     <ul class="list-group">
       {% for event in latest_events %}
         <li class="list-group-item d-flex justify-content-between align-items-start">
           <div>
-            <strong>{{ event.name }}</strong> - {{ event.date }}
+            <strong>{{ event.title }}</strong> - {{ event.date }}
             <p>{{ event.description }}</p>
           </div>
           {% if user.is_authenticated %}
