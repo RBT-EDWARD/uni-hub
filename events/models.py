@@ -10,7 +10,9 @@ class Event(models.Model):
     date = models.DateTimeField()
     community = models.ForeignKey(Community, on_delete=models.CASCADE)
     participants = models.ManyToManyField(User, related_name='joined_events', blank=True)
+    max_capacity = models.PositiveIntegerField(null=True, blank=True)
+    location = models.CharField(max_length=200, blank=True)
+    materials = models.TextField(blank=True)
     
-
     def __str__(self):
         return self.title

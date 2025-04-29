@@ -1,0 +1,16 @@
+{% extends "users/index_page.html" %}
+{% block content %}
+<div class="container mt-4">
+  <h2>Your Communities</h2>
+  <ul>
+    {% for community in communities %}
+      <li>
+        <strong>{{ community.name }}</strong><br>
+        <a href="{% url 'create_event' community.id %}" class="btn btn-sm btn-primary">Create Event</a>
+      </li>
+    {% empty %}
+      <p>You are not a leader of any communities.</p>
+    {% endfor %}
+  </ul>
+</div>
+{% endblock %}

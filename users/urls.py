@@ -20,5 +20,6 @@ urlpatterns = [
     path('search/', views.search_users, name='search_users'),
     path('create-community/', create_community, name='create_community'),
     path('communities/<int:pk>/', views.community_detail, name='community_detail'),
-
+    path("leader/dashboard/", views.leader_dashboard, name="leader_dashboard"),
+    path("leader/community/<int:community_id>/event/create/", views.create_event, name="create_event"),
 ]

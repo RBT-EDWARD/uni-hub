@@ -169,6 +169,11 @@ def leave_community(request, community_id):
         return redirect(next_url)
     return redirect('community_page')
 
+@login_required
+def leader_dashboard(request):
+    communities = Community.objects.filter(leader=request.user)
+    return render(request, "users/leader_dashboard.html", {"communities": communities})
+
 # Events View + Filters
 def event_page(request):
     events = Event.objects.all()
@@ -195,15 +200,38 @@ def event_page(request):
         'query_text': query_text,
     })
 
+@login_required
+def create_event(request, community_id):
+    community = get_object_or_404(Community, id=community_id)
+    if community.leader != request.user:
+        messages.error(request, "Only community leaders can create events.")
+        return redirect("community_page")
+
+    if request.method == "POST":
+        form = EventForm(request.POST)
+        if form.is_valid():
+            event = form.save(commit=False)
+            event.community = community
+            event.save()
+            messages.success(request, f"Event '{event.title}' created.")
+            return redirect("event_page")
+    else:
+        form = EventForm()
+
+    return render(request, "users/create_event.html", {"form": form, "community": community})
+
 # Join Event
 @login_required
 def join_event(request, event_id):
     event = get_object_or_404(Event, id=event_id)
-    if request.user not in event.participants.all():
+
+    if request.user in event.participants.all():
+        messages.info(request, "You have already joined this event.")
+    elif event.max_capacity and event.participants.count() >= event.max_capacity:
+        messages.warning(request, "Sorry, the event has reached its maximum capacity.")
+    else:
         event.participants.add(request.user)
         messages.success(request, f"You have successfully joined the event: {event.title}")
-    else:
-        messages.info(request, "You have already joined this event.")
 
     next_url = request.GET.get('next')
     if next_url and url_has_allowed_host_and_scheme(next_url, settings.ALLOWED_HOSTS):
