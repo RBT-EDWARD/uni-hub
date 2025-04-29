@@ -4,8 +4,12 @@ from django.contrib.auth.models import User
 
 class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
-    bio = models.TextField(blank=True)
-    interests = models.CharField(max_length=200, blank=True)
+    program = models.CharField(max_length=100, blank=True, null=True)
+    year = models.CharField(max_length=10, blank=True, null=True)
+    interests = models.CharField(max_length=255, blank=True, null=True)
+    campus_involvement = models.TextField(blank=True, null=True)
+    achievements = models.TextField(blank=True, null=True)
+    profile_picture = models.ImageField(upload_to='profile_pictures/', blank=True, null=True)
 
     def __str__(self):
         return self.user.username
