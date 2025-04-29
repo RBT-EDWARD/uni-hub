@@ -1,5 +1,7 @@
 from django.urls import path
 from . import views
+from .views import create_community
+from .views import community_detail
 
 urlpatterns = [
     path('login/', views.login_view, name='login'),
@@ -16,6 +18,7 @@ urlpatterns = [
     path('event/<int:event_id>/join/', views.join_event, name='join_event'),
     path('event/<int:event_id>/leave/', views.leave_event, name='leave_event'),
     path('search/', views.search_users, name='search_users'),
-
+    path('create-community/', create_community, name='create_community'),
+    path('communities/<int:pk>/', views.community_detail, name='community_detail'),
 
 ]

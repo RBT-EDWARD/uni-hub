@@ -1,4 +1,4 @@
-
+from communities.models import Community
 from .models import Profile
 from django import forms
 from django.contrib.auth.models import User
@@ -23,7 +23,11 @@ class UserRegisterForm(UserCreationForm):
         model = User
         fields = ['username', 'email', 'password1', 'password2', 'address', 'dob', 'interests']
 
-
+class CommunityForm(forms.ModelForm):
+    class Meta:
+        model = Community
+        fields = ['name', 'description', 'meeting_details', 'interest_tags']
+        
 class ProfileForm(forms.ModelForm):
     class Meta:
         model = Profile

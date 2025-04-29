@@ -1,0 +1,22 @@
+{% extends "users/index_page.html" %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2>Create a New Community</h2>
+
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }}">
+                {{ message }}
+            </div>
+        {% endfor %}
+    {% endif %}
+
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="btn btn-primary mt-3">Create Community</button>
+        <a href="{% url 'community_page' %}" class="btn btn-secondary mt-3 ms-2">Back to Communities</a>
+    </form>
+</div>
+{% endblock %}

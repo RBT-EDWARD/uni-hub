@@ -1,0 +1,17 @@
+{% extends "users/index_page.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>{{ community.name }}</h2>
+    <p><strong>Description:</strong> {{ community.description }}</p>
+    <p><strong>Meeting Details:</strong> {{ community.meeting_details }}</p>
+    <p><strong>Interest Tags:</strong> {{ community.interest_tags }}</p>
+    <p><strong>Members:</strong> {{ community.members.count }}</p>
+    <ul>
+        {% for member in community.members.all %}
+            <li>{{ member.username }}</li>
+        {% endfor %}
+    </ul>
+    <a href="{% url 'community_page' %}" class="btn btn-secondary">Back</a>
+</div>
+{% endblock %}

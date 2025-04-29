@@ -4,6 +4,8 @@ from django.contrib.auth.models import User
 class Community(models.Model):
     name = models.CharField(max_length=100)
     description = models.TextField()
+    meeting_details = models.TextField(blank=True, null=True)  # <-- Add this
+    interest_tags = models.CharField(max_length=200, blank=True) 
     members = models.ManyToManyField(User, related_name='communities', blank=True)
 
     def __str__(self):

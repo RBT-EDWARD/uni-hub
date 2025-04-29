@@ -1,5 +1,4 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from .forms import UserRegisterForm
 from django.contrib.auth import authenticate, login, logout
 from .models import *
 from django.contrib import messages
@@ -11,6 +10,7 @@ from datetime import datetime
 from django.utils.http import url_has_allowed_host_and_scheme
 from django.conf import settings
 from django.contrib.auth.models import User
+from .forms import UserRegisterForm, CommunityForm 
 
 # Registration View
 def register(request):
@@ -71,6 +71,24 @@ def home_view(request):
         'search_query': search_query,
         'matching_profiles': matching_profiles,
     })
+
+def community_detail(request, pk):
+    community = get_object_or_404(Community, id=pk)
+    return render(request, 'users/community_detail.html', {'community': community})
+
+@login_required
+def create_community(request):
+    if request.method == 'POST':
+        form = CommunityForm(request.POST)
+        if form.is_valid():
+            community = form.save(commit=False)
+            community.save()
+            community.members.add(request.user)
+            messages.success(request, f"Community '{community.name}' created successfully!")
+            return redirect('community_page')
+    else:
+        form = CommunityForm()
+    return render(request, 'users/create_community.html', {'form': form})
 
 # Profile View
 @login_required
