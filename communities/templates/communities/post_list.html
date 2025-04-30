@@ -25,18 +25,27 @@
     {% if posts %}
         <ul class="list-group">
             {% for post in posts %}
-                <li class="list-group-item">
-                    <h5>
-                        <a href="{% url 'post_detail' post.id %}">{{ post.title }}</a>
-                    </h5>
-                    <p class="mb-1">
-                        <small>by {{ post.author.username }} • {{ post.created_at|date:"M d, Y H:i" }}</small>
-                    </p>
-                    <p>{{ post.content|truncatewords:20 }}</p>
-                    {% if post.tags %}
-                        <span class="badge bg-secondary">Tags: {{ post.tags }}</span>
-                    {% endif %}
-                </li>
+                {% if post.visibility == "public" or user in community.members.all %}
+                    <li class="list-group-item">
+                        <h5>
+                            <a href="{% url 'post_detail' post.id %}">{{ post.title }}</a>
+                        </h5>
+                        <p class="mb-1">
+                            <small>
+                                by {{ post.author.username }} • {{ post.created_at|date:"M d, Y H:i" }}
+                                {% if post.visibility == "members" %}
+                                    <span class="badge bg-warning text-dark ms-2">Members Only</span>
+                                {% else %}
+                                    <span class="badge bg-info text-dark ms-2">Public</span>
+                                {% endif %}
+                            </small>
+                        </p>
+                        <p>{{ post.content|truncatewords:20 }}</p>
+                        {% if post.tags %}
+                            <span class="badge bg-secondary">Tags: {{ post.tags }}</span>
+                        {% endif %}
+                    </li>
+                {% endif %}
             {% endfor %}
         </ul>
     {% else %}

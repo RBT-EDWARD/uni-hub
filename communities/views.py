@@ -73,6 +73,11 @@ def post_detail(request, post_id):
     post = get_object_or_404(Post, id=post_id)
     comments = post.comments.order_by('created_at')
 
+    # Enforce visibility restriction
+    if post.visibility == 'members' and request.user not in post.community.members.all():
+        messages.error(request, "This post is only visible to community members.")
+        return redirect('community_page')
+
     if request.method == 'POST':
         if not request.user.is_authenticated:
             messages.error(request, "You must be logged in to comment.")
@@ -91,5 +96,5 @@ def post_detail(request, post_id):
     return render(request, 'communities/post_detail.html', {
         'post': post,
         'comments': comments,
-        'form': form
+        'comment_form': form  # match with template variable
     })
