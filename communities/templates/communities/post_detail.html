@@ -8,11 +8,13 @@
     </p>
     <p><strong>Tags:</strong> {{ post.tags }}</p>
     <p><strong>Visibility:</strong> {{ post.get_visibility_display }}</p>
+    
     {% if post.attachment %}
         <p><strong>Attachment:</strong> 
-            <a href="{{ post.attachment.url }}" download>{{ post.attachment.name|basename }}</a>
+            <a href="{{ post.attachment.url }}" download>{{ post.attachment_filename }}</a>
         </p>
     {% endif %}
+
     <hr>
     <p>{{ post.content }}</p>
 

@@ -1,4 +1,5 @@
-from django.db import models 
+import os
+from django.db import models
 from django.contrib.auth.models import User
 
 class Community(models.Model):
@@ -25,11 +26,14 @@ class Post(models.Model):
     tags = models.CharField(max_length=255, help_text="Comma-separated tags (e.g., study, math, group)")
     created_at = models.DateTimeField(auto_now_add=True)
     visibility = models.CharField(max_length=10, choices=VISIBILITY_CHOICES, default='public')
-    attachment = models.FileField(upload_to='post_attachments/', blank=True, null=True)  # for attachments
+    attachment = models.FileField(upload_to='post_attachments/', blank=True, null=True)
+
+    def attachment_filename(self):
+        return os.path.basename(self.attachment.name) if self.attachment else ""
 
     def __str__(self):
         return self.title
-    
+
 class Comment(models.Model):
     post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name='comments')
     author = models.ForeignKey(User, on_delete=models.CASCADE, related_name='comments')
